@@ -62,14 +62,14 @@ jobs:
           pwd
           ls
           cd gitlab-repo
-          docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest -f ../services/java/Dockerfile .
+          docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${{ github.run_number}} -f ../services/java/Dockerfile .
 
 
       - name: Push Docker image to ECR
         # env:
         #   IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${{ github.run_number}}
 
       # - name: Confirm pushed image
       #   run: |
