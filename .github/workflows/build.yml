@@ -61,7 +61,8 @@ jobs:
         run: |
           pwd
           ls
-          docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest .
+          ls ./services/java/Dockerfile
+          docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest -f ./services/java/Dockerfile .
 
 
       - name: Push Docker image to ECR
