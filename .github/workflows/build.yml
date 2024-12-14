@@ -16,7 +16,7 @@ jobs:
     name: Build, Scan, and Push Docker Image
     runs-on: ubuntu-latest
 
-    environment:
+    env:
       AWS_REGION: us-east-1 # Change to your AWS region
       ECR_REPO_NAME: my-app # Prefix for your ECR repositories
 
