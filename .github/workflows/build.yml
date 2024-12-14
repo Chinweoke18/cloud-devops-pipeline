@@ -24,11 +24,15 @@ jobs:
       - name: Checkout this repository
         uses: actions/checkout@v3
 
-      - name: Checkout target branch from another repo
-        uses: actions/checkout@v3
-        with:
-          repository: "cloud-devops-assignments/spring-boot-react-example" # Replace with the other repository
-          ref: "master"
+      # - name: Checkout target branch from another repo
+      #   uses: actions/checkout@v3
+      #   with:
+      #     repository: "cloud-devops-assignments/spring-boot-react-example" 
+      #     ref: "master"
+
+      - name: Checkout main branch from GitLab repo
+        run: |
+          git clone --branch master https://gitlab.com/cloud-devops-assignments/spring-boot-react-example
 
       - name: Set up Java
         uses: actions/setup-java@v3
