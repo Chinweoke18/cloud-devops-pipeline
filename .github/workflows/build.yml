@@ -42,7 +42,7 @@ jobs:
 
       - name: Build application
         run: |
-          ./mvnw clean install
+          mvn clean install
 
       - name: Run Snyk scan
         env:
