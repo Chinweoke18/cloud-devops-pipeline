@@ -12,7 +12,7 @@ jobs:
 
     env:
       AWS_REGION: us-east-1 
-      ECR_REPO_NAME: my-app 
+      ECR_REPO_NAME: java-ms-ecr-repo 
 
     steps:
       - name: Checkout this repository
