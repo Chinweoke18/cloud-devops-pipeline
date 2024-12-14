@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - main
-  # workflow_dispatch:
-  #   inputs:
-  #     target_branch:
-  #       description: "The branch to checkout from the other repository"
-  #       required: true
-  #       default: "dev"
 
 jobs:
   build-and-push:
@@ -17,18 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      AWS_REGION: us-east-1 # Change to your AWS region
-      ECR_REPO_NAME: my-app # Prefix for your ECR repositories
+      AWS_REGION: us-east-1 
+      ECR_REPO_NAME: my-app 
 
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v3
-
-      # - name: Checkout target branch from another repo
-      #   uses: actions/checkout@v3
-      #   with:
-      #     repository: "cloud-devops-assignments/spring-boot-react-example" 
-      #     ref: "master"
 
       - name: Checkout main branch from GitLab repo
         run: |
@@ -49,11 +37,6 @@ jobs:
         run: |
           npm install -g snyk
 
-      # - name: Run Snyk scan
-      #   run: |
-      #     cd gitlab-repo
-      #     snyk test --all-projects
-
       - name: Run Snyk scan
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
@@ -73,19 +56,20 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and tag Docker image
-        env:
-          BRANCH_NAME: ${{ github.event.inputs.target_branch }}
+        # env:
+        #   BRANCH_NAME: ${{ github.event.inputs.target_branch }}
         run: |
-          IMAGE_TAG=$(echo "${BRANCH_NAME}" | tr '/' '-')
-          docker build -t $AWS_REGION.amazonaws.com/$ECR_REPO_NAME-$IMAGE_TAG:latest .
-          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+          pwd
+          ls
+          docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest .
+
 
       - name: Push Docker image to ECR
-        env:
-          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        # env:
+        #   IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
-          docker push $AWS_REGION.amazonaws.com/$ECR_REPO_NAME-$IMAGE_TAG:latest
+          docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:latest
 
-      - name: Confirm pushed image
-        run: |
-          echo "Docker image pushed to ECR repository: $AWS_REGION.amazonaws.com/$ECR_REPO_NAME-${{ env.IMAGE_TAG }}:latest"
+      # - name: Confirm pushed image
+      #   run: |
+      #     echo "Docker image pushed to ECR repository: $AWS_REGION.amazonaws.com/$ECR_REPO_NAME-${{ env.IMAGE_TAG }}:latest"
