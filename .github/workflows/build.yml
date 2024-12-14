@@ -32,7 +32,7 @@ jobs:
 
       - name: Checkout main branch from GitLab repo
         run: |
-          git clone --branch master https://gitlab.com/cloud-devops-assignments/spring-boot-react-example
+          git clone --branch master https://gitlab.com/cloud-devops-assignments/spring-boot-react-example gitlab-repo
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -42,6 +42,7 @@ jobs:
 
       - name: Build application
         run: |
+          cd gitlab-repo
           mvn clean install
 
       - name: Run Snyk scan
