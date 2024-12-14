@@ -45,11 +45,20 @@ jobs:
           cd gitlab-repo
           mvn clean install
 
-      - name: Run Snyk scan
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Install Snyk CLI
         run: |
+          npm install -g snyk
+
+      - name: Run Snyk scan
+        run: |
+          cd gitlab-repo
           snyk test --all-projects
+
+      # - name: Run Snyk scan
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   run: |
+      #     snyk test --all-projects
 
       - name: Log in to Amazon ECR
         id: ecr-login
