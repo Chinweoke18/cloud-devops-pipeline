@@ -58,6 +58,7 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
+          cd gitlab-repo
           snyk test --maven-aggregate-project
 
       - name: Configure AWS credentials
