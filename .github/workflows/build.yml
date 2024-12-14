@@ -71,6 +71,26 @@ jobs:
         run: |
           docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${{ github.run_number}}
 
-      # - name: Confirm pushed image
-      #   run: |
-      #     echo "Docker image pushed to ECR repository: $AWS_REGION.amazonaws.com/$ECR_REPO_NAME-${{ env.IMAGE_TAG }}:latest"
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.9.8
+
+    - name: Install Terragrunt
+      run: |
+        curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.51.3/terragrunt_linux_amd64 -o /usr/local/bin/terragrunt
+        chmod +x /usr/local/bin/terragrunt
+
+    - name: Run Terragrunt init
+      working-directory: ./services/java/dev 
+      run: terragrunt init
+
+    - name: Run Terragrunt init
+      working-directory: ./services/java/dev 
+      run: terragrunt plan
+
+    - name: Run Terragrunt Apply
+      working-directory: ./services/java/dev 
+      run: terragrunt apply --auto-approve
+
+
