@@ -1,0 +1,62 @@
+name: .NET Build and Dockerize
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Checkout main branch from GitLab repo
+        run: |
+          git clone --branch main https://gitlab.com/blue-harvest-assignments/cloud-assignment.git gitlab-repo
+
+      # Setup .NET environment
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.x'
+
+      # Restore dependencies
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      # Build the application
+      - name: Build Project
+        run: dotnet build --configuration Release --no-restore
+
+      # Run unit tests
+      - name: Run Unit Tests
+        run: dotnet test --no-restore --verbosity normal
+
+      # Publish the application
+      - name: Publish Application
+        run: dotnet publish --configuration Release --output ./publish
+
+  dockerize:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      # Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Build Docker image
+      - name: Build Docker Image
+        run: docker build -t my-dotnet-app:latest .
+
+      # Save Docker Image as an Artifact (Optional)
+      - name: Save Docker Image
+        uses: actions/upload-artifact@v3
+        with:
+          name: my-dotnet-app
+          path: ./publish
