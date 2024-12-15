@@ -61,9 +61,15 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Checkout main branch from GitLab repo
+        run: |
+          git clone --branch main https://gitlab.com/blue-harvest-assignments/cloud-assignment.git gitlab-repo
+
       # Build Docker image
       - name: Build Docker Image
-        run: docker build -t my-dotnet-app:latest .
+        run: |
+          cd gitlab-repo
+          docker build -t my-dotnet-app:latest -f aspnet-core-dotnet-core/Dockerfile .
 
       # Save Docker Image as an Artifact (Optional)
       - name: Save Docker Image
