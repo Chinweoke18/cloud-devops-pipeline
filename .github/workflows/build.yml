@@ -98,6 +98,6 @@ jobs:
 
       - name: Run Terragrunt Apply
         working-directory: ./services/java/dev 
-        run: terragrunt apply --auto-approve
+        run: terragrunt apply 
 
 
