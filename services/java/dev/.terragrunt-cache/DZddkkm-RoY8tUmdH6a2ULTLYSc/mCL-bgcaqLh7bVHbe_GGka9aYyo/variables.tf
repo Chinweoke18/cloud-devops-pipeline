@@ -38,6 +38,13 @@ variable "lb_security_groups" {
   type        = string
 }
 
+variable "listener_arn" {
+  type        = string
+}
+
+variable "pattern_value" {
+  type        =  list(string)
+}
 
 variable "execution_role_arn" {
   type        = string

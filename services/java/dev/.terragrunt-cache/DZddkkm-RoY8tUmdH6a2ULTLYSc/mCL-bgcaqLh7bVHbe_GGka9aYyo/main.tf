@@ -22,9 +22,22 @@ resource "aws_ecr_repository" "ecs" {
   }
 }
 
+data "external" "tags_of_most_recently_pushed_image" {
+  program = [
+    "aws", "ecr", "describe-images",
+    "--repository-name", "${aws_ecr_repository.ecs.name}",
+    "--query", "{\"tags\": to_string(sort_by(imageDetails, &imagePushedAt)[-1].imageTags)}",
+    "--region", "${var.region}"
+  ]
+}
+
+output "repository_uri" {
+  value = aws_ecr_repository.ecs.repository_url
+}
+
 resource "aws_alb_target_group" "app" {
   name        = "${var.microservice_name}-tg"
-  port        = 80
+  port        = var.app_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
   target_type = "ip"
@@ -40,17 +53,33 @@ resource "aws_alb_target_group" "app" {
   }
 }
 
-# Redirect all traffic from the ALB to the target group
-resource "aws_alb_listener" "alb" {
-  load_balancer_arn = var.load_balancer_arn
-  port              = var.app_port
-  protocol          = "HTTP"
+resource "aws_lb_listener_rule" "static" {
+  listener_arn = var.listener_arn
+  priority     = 100
 
-  default_action {
-    target_group_arn = aws_alb_target_group.app.id
+  action {
     type             = "forward"
+    target_group_arn = aws_alb_target_group.app.arn
+  }
+
+  condition {
+    path_pattern {
+      values = var.pattern_value #["/api/*"]
+    }
   }
 }
+
+# Redirect all traffic from the ALB to the target group
+# resource "aws_alb_listener" "alb" {
+#   load_balancer_arn = var.load_balancer_arn
+#   port              = "80"
+#   protocol          = "HTTP"
+
+#   default_action {
+#     target_group_arn = aws_alb_target_group.app.id
+#     type             = "forward"
+#   }
+# }
 
 
 
@@ -81,9 +110,9 @@ data "template_file" "cb_app" {
 
   vars = {
     microservice_name = var.microservice_name
-    # image_id       = (jsondecode(data.external.tags_of_most_recently_pushed_image.result.tags) == null ? "latest" : jsondecode(data.external.tags_of_most_recently_pushed_image.result.tags)[0])
-    app_image      = var.app_image
-    ecr_repo_url   = aws_ecr_repository.ecs.repository_url
+    image_tag      = (jsondecode(data.external.tags_of_most_recently_pushed_image.result.tags) == null ? "latest" : jsondecode(data.external.tags_of_most_recently_pushed_image.result.tags)[0])
+    app_image      = aws_ecr_repository.ecs.repository_url
+    # ecr_repo_url   = aws_ecr_repository.ecs.repository_url
     app_port       = var.app_port
     app_name       = var.microservice_name
     fargate_cpu    = var.fargate_cpu
@@ -125,9 +154,9 @@ resource "aws_ecs_service" "main" {
     container_port   = var.app_port
   }
 
-  depends_on = [aws_alb_listener.alb, aws_cloudwatch_log_group.cb_log_group]
+  depends_on = [aws_cloudwatch_log_group.cb_log_group]
 }
-
+#aws_alb_listener.alb, 
 
 
 # Microservice autoscaling
