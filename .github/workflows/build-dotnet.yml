@@ -37,15 +37,21 @@ jobs:
 
       # Build the application
       - name: Build Project
-        run: dotnet build --configuration Release --no-restore
+        run: |
+          cd gitlab-repo
+          dotnet build --configuration Release --no-restore
 
       # Run unit tests
       - name: Run Unit Tests
-        run: dotnet test --no-restore --verbosity normal
+        run: |
+          cd gitlab-repo
+          dotnet test --no-restore --verbosity normal
 
       # Publish the application
       - name: Publish Application
-        run: dotnet publish --configuration Release --output ./publish
+        run: |
+          cd gitlab-repo
+          dotnet publish --configuration Release --output ./publish
 
   dockerize:
     runs-on: ubuntu-latest
