@@ -7,10 +7,10 @@ inputs = {
   environment = "dev"
 
 microservice_name = "java-ms"
-health_check_path = "/"
+health_check_path = "/java"
 load_balancer_arn = "arn:aws:elasticloadbalancing:us-east-1:211125593418:loadbalancer/app/cloud-devops-alb/0a99c5d8704fbba8"
 listener_arn = "arn:aws:elasticloadbalancing:us-east-1:211125593418:listener/app/cloud-devops-alb/0a99c5d8704fbba8/083e80da22e57219"
-pattern_value = ["/api/*"]
+pattern_value = ["/java"]
 lb_security_groups = "sg-0b0c9c10769180f8b"
 app_port = "8080"
 vpc_id =  "vpc-0f84b492e0a2e540a"

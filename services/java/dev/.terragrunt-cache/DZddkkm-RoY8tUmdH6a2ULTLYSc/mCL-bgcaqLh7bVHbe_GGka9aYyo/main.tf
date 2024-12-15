@@ -53,33 +53,33 @@ resource "aws_alb_target_group" "app" {
   }
 }
 
-resource "aws_lb_listener_rule" "static" {
-  listener_arn = var.listener_arn
-  priority     = 100
+# resource "aws_lb_listener_rule" "static" {
+#   listener_arn = var.listener_arn
+#   # priority     = 100
 
-  action {
-    type             = "forward"
-    target_group_arn = aws_alb_target_group.app.arn
-  }
-
-  condition {
-    path_pattern {
-      values = var.pattern_value #["/api/*"]
-    }
-  }
-}
-
-# Redirect all traffic from the ALB to the target group
-# resource "aws_alb_listener" "alb" {
-#   load_balancer_arn = var.load_balancer_arn
-#   port              = "80"
-#   protocol          = "HTTP"
-
-#   default_action {
-#     target_group_arn = aws_alb_target_group.app.id
+#   action {
 #     type             = "forward"
+#     target_group_arn = aws_alb_target_group.app.arn
+#   }
+
+#   condition {
+#     path_pattern {
+#       values = var.pattern_value
+#     }
 #   }
 # }
+
+# Redirect all traffic from the ALB to the target group
+resource "aws_alb_listener" "alb" {
+  load_balancer_arn = var.load_balancer_arn
+  port              = var.app_port #"80"
+  protocol          = "HTTP"
+
+  default_action {
+    target_group_arn = aws_alb_target_group.app.id
+    type             = "forward"
+  }
+}
 
 
 
@@ -248,4 +248,8 @@ resource "aws_cloudwatch_metric_alarm" "service_cpu_low" {
   }
 
   alarm_actions = [aws_appautoscaling_policy.down.arn]
+}
+
+terraform {
+  backend "s3" {}
 }
