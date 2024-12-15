@@ -29,7 +29,11 @@ jobs:
 
       # Restore dependencies
       - name: Restore Dependencies
-        run: dotnet restore
+        run: |
+          pwd
+          ls
+          cd gitlab-repo
+          dotnet restore
 
       # Build the application
       - name: Build Project
