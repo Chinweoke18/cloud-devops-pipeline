@@ -56,18 +56,12 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and tag Docker image
-        # env:
-        #   BRANCH_NAME: ${{ github.event.inputs.target_branch }}
         run: |
-          pwd
-          ls
           cd gitlab-repo
           docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${{ github.run_number}} -f ../services/java/Dockerfile .
 
 
       - name: Push Docker image to ECR
-        # env:
-        #   IMAGE_TAG: ${{ env.IMAGE_TAG }}
         run: |
           docker push ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${{ github.run_number}}
 
@@ -81,11 +75,23 @@ jobs:
           curl -L https://github.com/gruntwork-io/terragrunt/releases/download/v0.51.3/terragrunt_linux_amd64 -o /usr/local/bin/terragrunt
           chmod +x /usr/local/bin/terragrunt
 
+      - name: Set environment variables
+        id: set-env
+        run: |
+          if [[ "${{ github.ref_name }}" == "dev" ]]; then
+            echo "ENV_PATH=./services/java/dev" >> $GITHUB_ENV
+          elif [[ "${{ github.ref_name }}" == "qa" ]]; then
+            echo "ENV_PATH=./services/java/qa" >> $GITHUB_ENV
+          else
+            echo "Invalid branch: ${{ github.ref_name }}"
+            exit 1
+          fi
+
       - name: Run Terragrunt init
         working-directory: ./services/java/dev 
         run: terragrunt init
 
-      - name: Run Terragrunt init
+      - name: Run Terragrunt plan
         working-directory: ./services/java/dev 
         run: terragrunt plan
 
