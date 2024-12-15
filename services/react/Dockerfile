@@ -1,17 +1,36 @@
-# Copy package.json and package-lock.json if available
+# # Copy package.json and package-lock.json if available
+# COPY package*.json ./
+
+# # Install the dependencies
+# RUN npm install
+
+# # Copy all source files into the container
+# COPY . .
+
+# # Install 'serve' globally for serving React files
+# RUN npm install -g serve
+
+# # Expose port 5000 (default port for `serve`)
+# EXPOSE 3000
+
+# # Use `serve` to serve the React application
+# CMD ["serve", "-s", "./src/main/js"]
+
+FROM node:16-alpine
+
+WORKDIR /app
+
 COPY package*.json ./
 
-# Install the dependencies
 RUN npm install
 
-# Copy all source files into the container
+# RUN npm install caniuse-lite@latest browserslist@latest
+# RUN npx browserslist@latest --update-db
+
 COPY . .
 
-# Install 'serve' globally for serving React files
-RUN npm install -g serve
+EXPOSE 3000
 
-# Expose port 5000 (default port for `serve`)
-EXPOSE 5000
+# RUN npm run watch
 
-# Use `serve` to serve the React application
-CMD ["serve", "-s", "./src/main/js"]
+CMD ["npm", "run", "watch"]
