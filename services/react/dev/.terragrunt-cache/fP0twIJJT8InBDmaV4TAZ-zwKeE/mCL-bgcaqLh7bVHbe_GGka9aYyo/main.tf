@@ -15,7 +15,6 @@ resource "aws_cloudwatch_log_group" "cb_log_group" {
 
 resource "aws_ecr_repository" "ecs" {
   name                 = "${var.microservice_name}-ecr-repo"
-  force_delete = true
   # image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {

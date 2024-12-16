@@ -1,9 +1,10 @@
-name: Build, Scan, and Push to ECR
+name: Build, Scan, and Push to ECR (React)
 
 on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   build-and-push:
@@ -12,7 +13,7 @@ jobs:
 
     env:
       AWS_REGION: us-east-1 
-      ECR_REPO_NAME: java-ms-ecr-repo 
+      ECR_REPO_NAME: react-ms-ecr-repo 
 
     steps:
       - name: Checkout this repository
@@ -21,17 +22,6 @@ jobs:
       - name: Checkout main branch from GitLab repo
         run: |
           git clone --branch master https://gitlab.com/cloud-devops-assignments/spring-boot-react-example gitlab-repo
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          java-version: 17
-          distribution: temurin
-
-      - name: Build application
-        run: |
-          cd gitlab-repo
-          mvn clean install
 
       - name: Install Snyk CLI
         run: |
@@ -42,7 +32,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: |
           cd gitlab-repo
-          snyk test --maven-aggregate-project || echo "Snyk scan completed with vulnerabilities"
+          snyk test --react || echo "Snyk scan completed with vulnerabilities"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -58,8 +48,7 @@ jobs:
       - name: Build and tag Docker image
         run: |
           cd gitlab-repo
-          docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${{ github.run_number}} -f ../services/java/Dockerfile .
-
+          docker build -t ${{ secrets.ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO_NAME:${{ github.run_number}} -f ../services/react/Dockerfile .
 
       - name: Push Docker image to ECR
         run: |
@@ -79,24 +68,27 @@ jobs:
         id: set-env
         run: |
           if [[ "${{ github.ref_name }}" == "dev" ]]; then
-            echo "ENV_PATH=./services/java/dev" >> $GITHUB_ENV
+            echo "ENV_PATH=./services/react/dev" >> $GITHUB_ENV
           elif [[ "${{ github.ref_name }}" == "qa" ]]; then
-            echo "ENV_PATH=./services/java/qa" >> $GITHUB_ENV
+            echo "ENV_PATH=./services/react/qa" >> $GITHUB_ENV
           else
             echo "Invalid branch: ${{ github.ref_name }}"
             exit 1
           fi
 
       - name: Run Terragrunt init
-        working-directory: ./services/java/dev 
-        run: terragrunt init
+        working-directory: ./services/react/dev 
+        run: terragrunt init --terragrunt-non-interactive 
 
       - name: Run Terragrunt plan
-        working-directory: ./services/java/dev 
+        working-directory: ./services/react/dev 
         run: terragrunt plan
 
-      - name: Run Terragrunt Apply
-        working-directory: ./services/java/dev 
+      - name: Run Terragrunt apply
+        working-directory: ./services/react/dev 
         run: terragrunt apply --auto-approve
 
+      - name: Run Terragrunt Destroy
+        working-directory: ./services/react/dev 
+        run: terragrunt destroy --auto-approve
 
