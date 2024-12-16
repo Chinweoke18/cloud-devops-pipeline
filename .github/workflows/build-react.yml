@@ -87,3 +87,7 @@ jobs:
       - name: Run Terragrunt apply
         working-directory: ./services/react/dev 
         run: terragrunt apply --auto-approve
+
+      - name: Run Terragrunt Destroy
+        working-directory: ./services/react/dev 
+        run: terragrunt destroy --auto-approve
