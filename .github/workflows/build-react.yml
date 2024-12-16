@@ -78,7 +78,7 @@ jobs:
 
       - name: Run Terragrunt init
         working-directory: ./services/react/dev 
-        run: terragrunt init
+        run: terragrunt init --terragrunt-non-interactive 
 
       - name: Run Terragrunt plan
         working-directory: ./services/react/dev 
@@ -91,4 +91,4 @@ jobs:
       - name: Run Terragrunt Destroy
         working-directory: ./services/react/dev 
         run: terragrunt destroy --auto-approve
-        
+

@@ -6,12 +6,16 @@ terraform {
 remote_state {
   backend = "s3"
   config = {
-    bucket         = "cloud-pipeline-tf-state-d0f9670e"
+    bucket         = "cloud-pipeline-tfrm-state-d0f9670e"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = "us-east-1"
     encrypt        = true
-    dynamodb_table = "cloud-devops-pipeline-lock-table"
+    dynamodb_table = "cloud-devops-pipeline-tform-lock-table"
   }
+
+}
+locals {
+  auto_approve = true
 }
 
 inputs = {

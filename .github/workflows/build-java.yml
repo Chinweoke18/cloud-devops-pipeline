@@ -90,7 +90,7 @@ jobs:
 
       - name: Run Terragrunt init
         working-directory: ./services/java/dev 
-        run: terragrunt init
+        run: terragrunt init --terragrunt-non-interactive 
 
       - name: Run Terragrunt plan
         working-directory: ./services/java/dev 
