@@ -15,7 +15,7 @@ resource "aws_cloudwatch_log_group" "cb_log_group" {
 
 resource "aws_ecr_repository" "ecs" {
   name                 = "${var.microservice_name}-ecr-repo"
-  image_tag_mutability = "IMMUTABLE"
+  # image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -52,22 +52,6 @@ resource "aws_alb_target_group" "app" {
     unhealthy_threshold = "2"
   }
 }
-
-# resource "aws_lb_listener_rule" "static" {
-#   listener_arn = var.listener_arn
-#   # priority     = 100
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_alb_target_group.app.arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = var.pattern_value
-#     }
-#   }
-# }
 
 # Redirect all traffic from the ALB to the target group
 resource "aws_alb_listener" "alb" {
